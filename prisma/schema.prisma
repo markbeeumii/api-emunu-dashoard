@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Categories{
+  id            Int         @id     @default(autoincrement())
+  slug          String      @unique
+  title_en      String?
+  title_kh      String?
+  title_ch      String?
+  description   String?      @db.VarChar(255)
+  thumbnail     String?      @db.VarChar(255)
+  products      Menus[]
+  menu_category Menu_Categories[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model Menus{
+  id            Int             @id     @default(autoincrement())
+  code          String          @unique
+  title_en      String?
+  title_kh      String?
+  title_ch      String?
+  price         Decimal?        @db.Decimal(10, 2)
+  category      Categories      @relation(fields: [category_Id], references: [id])
+  category_Id   Int
+  Menu_Price    Menu_Price[]
+  top           Boolean         @default(false)   
+  menu_category Menu_Categories[]
+  description   String?         @db.VarChar(255)
+  thumbnail     String?         @db.VarChar(255)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model Users{
+  id                Int         @id     @default(autoincrement())
+  username          String?
+  email             String      @unique
+  password          String
+  gender            String?
+  phone_number      String?
+  profile_picture   String?     @db.VarChar(255)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model Menu_Price{
+  id                Int         @id     @default(autoincrement())
+  size              String
+  price             Decimal     @db.Decimal(10, 2)
+  menu              Menus       @relation(fields: [menu_code], references: [code])
+  menu_code         String
+}
+
+model Menu_Categories{
+  id                Int         @id     @default(autoincrement())
+  menus             Menus       @relation(fields: [menu_id], references: [id])
+  menu_id           Int
+  category          Categories  @relation(fields: [category_id], references: [id])
+  category_id       Int
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
